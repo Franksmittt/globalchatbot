@@ -1,0 +1,904 @@
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\favicon.ico
+================================================================================
+[Could not read file: 'utf-8' codec can't decode byte 0x96 in position 50: invalid start byte]
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\globals.css
+================================================================================
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Brand Colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  
+  /* Enhanced Shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-large: 0 10px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Grid pattern utility */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Custom utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\layout.tsx
+================================================================================
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Global Batteries - Chat Management Dashboard",
+  description: "Internal dashboard for managing customer inquiries via WhatsApp and chatbot. Powering the Global Batteries team.",
+  keywords: ["chat management", "whatsapp api", "customer support", "car battery store"],
+  authors: [{ name: "Global Batteries Team" }],
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
+      </body>
+    </html>
+  );
+}
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\not-found.tsx
+================================================================================
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Home, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
+export default function NotFound() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-8xl font-bold text-blue-600 mb-4"
+          >
+            404
+          </motion.div>
+          
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-2xl font-bold text-gray-900 mb-4"
+          >
+            Page Not Found
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-gray-600 mb-8"
+          >
+            Sorry, we couldn&apos;t find the page you&apos;re looking for. 
+            It might have been moved, deleted, or you entered the wrong URL.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Go Home
+            </Link>
+            
+            <button
+              onClick={() => window.history.back()}
+              className="inline-flex items-center justify-center border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-full font-medium hover:bg-blue-600 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go Back
+            </button>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\page.tsx
+================================================================================
+import Login from '@/components/Login';
+
+export default function Home() {
+  return <Login />;
+}
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\dashboard\page.tsx
+================================================================================
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Dashboard from '@/components/Dashboard';
+
+export default function DashboardPage() {
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <Header />
+      <main className="flex-1 p-4 md:p-8">
+        <Dashboard />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\Dashboard.tsx
+================================================================================
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { MessageSquare, Send, Bot, User, Phone, CheckCircle, XCircle, Search } from 'lucide-react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+
+const chats = [
+  { id: 1, name: 'John Smith', lastMessage: 'My battery is completely flat.', time: '1:32 PM', status: 'bot', assignedTo: null },
+  { id: 2, name: 'Jane Williams', lastMessage: 'Do you have the 646 battery in stock?', time: '1:25 PM', status: 'staff', assignedTo: 'John Doe' },
+  { id: 3, name: 'Sipho Zulu', lastMessage: 'I need a jump-start in Alberton.', time: '1:10 PM', status: 'bot', assignedTo: null },
+  { id: 4, name: 'Peter Jones', lastMessage: 'How long is the Willard warranty?', time: '12:55 PM', status: 'bot', assignedTo: null },
+  { id: 5, name: 'Nonhlanhla Dlamini', lastMessage: 'Thank you, the fitment was quick!', time: 'Yesterday', status: 'resolved', assignedTo: 'Jane Smith' },
+];
+
+const messages = [
+  { id: 1, sender: 'bot', text: 'Hi there! I\'m the Global Batteries Smart Assistant. How can I help you today?' },
+  { id: 2, sender: 'user', text: 'My battery is completely flat. My car is a 2018 Toyota Corolla.' },
+  { id: 3, sender: 'bot', text: 'Sorry to hear that. A flat battery can be a sign of a larger issue. I recommend our free battery and alternator test. Or, if you\'re in the Alberton area, we can send a driver to assist you with a jump-start. Would you like me to hand you over to a staff member to assist further?' },
+  { id: 4, sender: 'user', text: 'Yes please. I am in the Alberton area.' },
+  { id: 5, sender: 'bot', text: 'I am connecting you with a live agent. Please hold...' },
+];
+
+const Dashboard = () => {
+  const [selectedChat, setSelectedChat] = useState(chats[0]);
+  const [parent] = useAutoAnimate();
+
+  return (
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] space-y-4 lg:space-y-0 lg:space-x-4">
+      
+      {/* Sidebar: Chat List */}
+      <motion.div
+        initial={{ x: -20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full lg:w-1/3 bg-white rounded-lg shadow-lg flex flex-col overflow-hidden"
+      >
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-2xl font-semibold text-gray-900">Conversations</h2>
+          <div className="relative mt-4">
+            <input
+              type="text"
+              placeholder="Search chats..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto" ref={parent}>
+          {chats.map((chat) => (
+            <div
+              key={chat.id}
+              onClick={() => setSelectedChat(chat)}
+              className={`flex items-center p-4 border-b border-gray-100 cursor-pointer transition-colors ${selectedChat.id === chat.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}`}
+            >
+              <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xl mr-4">
+                {chat.name.charAt(0)}
+                <span
+                  className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
+                    chat.status === 'staff' ? 'bg-green-500' :
+                    chat.status === 'bot' ? 'bg-yellow-400' :
+                    'bg-gray-400'
+                  }`}
+                />
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-gray-900">{chat.name}</h3>
+                  <span className="text-xs text-gray-500">{chat.time}</span>
+                </div>
+                <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
+                {chat.assignedTo && (
+                  <span className="text-xs text-blue-600 font-medium">Assigned to: {chat.assignedTo}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Main Chat View */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="flex-1 bg-white rounded-lg shadow-lg flex flex-col overflow-hidden"
+      >
+        {selectedChat ? (
+          <>
+            {/* Chat Header */}
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xl mr-4">
+                  {selectedChat.name.charAt(0)}
+                  <span
+                    className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
+                      selectedChat.status === 'staff' ? 'bg-green-500' :
+                      selectedChat.status === 'bot' ? 'bg-yellow-400' :
+                      'bg-gray-400'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedChat.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    {selectedChat.status === 'bot' ? 'Assisted by Chatbot' : 'Assigned to a staff member'}
+                  </p>
+                </div>
+              </div>
+              <div className="space-x-2">
+                <button className="p-2 text-gray-500 hover:text-green-600 transition-colors" aria-label="Mark as Resolved">
+                  <CheckCircle className="h-6 w-6" />
+                </button>
+                <button className="p-2 text-gray-500 hover:text-red-600 transition-colors" aria-label="Mark as Unresolved">
+                  <XCircle className="h-6 w-6" />
+                </button>
+                <a href={`tel:${selectedChat.id}`} className="p-2 text-gray-500 hover:text-blue-600 transition-colors" aria-label="Call Customer">
+                  <Phone className="h-6 w-6" />
+                </a>
+              </div>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-gray-50">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex items-start ${msg.sender === 'user' ? 'justify-end' : ''}`}
+                >
+                  <div className={`p-4 rounded-xl shadow-sm max-w-[70%] ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}`}>
+                    <p className="text-sm">{msg.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Message Input */}
+            <div className="p-4 border-t border-gray-200 bg-white">
+              <form className="flex space-x-2">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center transition-all duration-200 hover:bg-blue-700"
+                  aria-label="Send Message"
+                >
+                  <Send className="w-6 h-6 -ml-1" />
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-center flex-1 text-gray-500">
+            <p>Select a chat to view the conversation.</p>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+};
+
+export default Dashboard;
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\Footer.tsx
+================================================================================
+'use client';
+
+import { motion } from 'framer-motion';
+
+const Footer = () => {
+  return (
+    <footer className="bg-white border-t border-gray-200">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-gray-500 text-sm">
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          © {new Date().getFullYear()} Global Batteries. All rights reserved.
+        </motion.p>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\Header.tsx
+================================================================================
+'use client';
+
+import { motion } from 'framer-motion';
+import { Bot, LogOut, User } from 'lucide-react';
+
+const Header = () => {
+  return (
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
+      <nav className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center"
+          >
+            <Bot className="h-8 w-8 text-blue-600 mr-2" />
+            <span className="text-2xl font-bold text-gray-900">
+              Chat Manager
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center space-x-4"
+          >
+            <div className="hidden sm:flex items-center space-x-2">
+              <User className="h-6 w-6 text-gray-500" />
+              <span className="text-gray-700 font-medium">John Doe</span>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2 group-hover:text-red-500 transition-colors" />
+              Log Out
+            </motion.button>
+          </motion.div>
+        </div>
+      </nav>
+    </header>
+  );
+};
+
+export default Header;
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\Login.tsx
+================================================================================
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Bot, LogIn } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Hardcoded credentials for demonstration
+    const validUsername = 'admin';
+    const validPassword = 'admin';
+
+    // Check if the entered credentials are correct
+    if (username === validUsername && password === validPassword) {
+      console.log('Login successful! Redirecting to dashboard...');
+      router.push('/dashboard');
+    } else {
+      console.log('Login failed: Incorrect username or password.');
+      alert('Login failed: Incorrect username or password.');
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200"
+      >
+        <div className="flex flex-col items-center justify-center mb-6">
+          <Bot className="h-12 w-12 text-blue-600 mb-2" />
+          <h1 className="text-3xl font-bold text-gray-900">
+            Staff Login
+          </h1>
+          <p className="text-gray-500 mt-1 text-center">
+            Log in to your Global Batteries chat management dashboard.
+          </p>
+        </div>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="username">
+              Username
+            </label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            />
+          </div>
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-md"
+          >
+            <LogIn className="h-5 w-5 mr-2" />
+            Sign In
+          </motion.button>
+        </form>
+      </motion.div>
+    </div>
+  );
+};
+
+export default Login;
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\ui\Button.tsx
+================================================================================
+'use client';
+
+import React, { ReactNode } from 'react';
+import { motion } from 'framer-motion';
+
+interface ButtonProps {
+  children: ReactNode;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+}
+
+const Button = ({ 
+  children, 
+  variant = 'primary', 
+  size = 'md', 
+  href, 
+  onClick, 
+  className = '',
+  disabled = false 
+}: ButtonProps) => {
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2';
+  
+  const variants = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl',
+    secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 shadow-lg hover:shadow-xl',
+    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500'
+  };
+  
+  const sizes = {
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg'
+  };
+  
+  const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+  
+  const MotionComponent = href ? motion.a : motion.button;
+  
+  return (
+    <MotionComponent
+      href={href}
+      onClick={disabled ? undefined : onClick}
+      whileHover={disabled ? {} : { scale: 1.05 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
+      className={classes}
+      disabled={disabled}
+    >
+      {children}
+    </MotionComponent>
+  );
+};
+
+export default Button;
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\ui\Card.tsx
+================================================================================
+'use client';
+
+import React, { ReactNode } from 'react';
+import { motion } from 'framer-motion';
+
+interface CardProps {
+  children: ReactNode;
+  className?: string;
+  hover?: boolean;
+  padding?: 'sm' | 'md' | 'lg';
+}
+
+const Card = ({ children, className = '', hover = true, padding = 'md' }: CardProps) => {
+  const paddings = {
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8'
+  };
+  
+  const baseClasses = `bg-white rounded-lg shadow-md border border-gray-200 ${paddings[padding]} ${className}`;
+  
+  if (hover) {
+    return (
+      <motion.div
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.3 }}
+        className={`${baseClasses} hover:shadow-xl transition-shadow duration-300`}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+  
+  return (
+    <div className={baseClasses}>
+      {children}
+    </div>
+  );
+};
+
+export default Card;
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\ui\Container.tsx
+================================================================================
+'use client';
+
+import React, { ReactNode } from 'react';
+
+interface ContainerProps {
+  children: ReactNode;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  className?: string;
+}
+
+const Container = ({ children, size = 'lg', className = '' }: ContainerProps) => {
+  const sizes = {
+    sm: 'max-w-3xl',
+    md: 'max-w-5xl',
+    lg: 'max-w-7xl',
+    xl: 'max-w-8xl',
+    full: 'max-w-full'
+  };
+  
+  return (
+    <div className={`${sizes[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+export default Container;
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\ui\Section.tsx
+================================================================================
+'use client';
+
+import React, { ReactNode } from 'react';
+import { motion } from 'framer-motion';
+
+interface SectionProps {
+  children: ReactNode;
+  className?: string;
+  background?: 'white' | 'gray' | 'gradient';
+  padding?: 'sm' | 'md' | 'lg' | 'xl';
+  animate?: boolean;
+}
+
+const Section = ({ 
+  children, 
+  className = '', 
+  background = 'white',
+  padding = 'lg',
+  animate = true 
+}: SectionProps) => {
+  const backgrounds = {
+    white: 'bg-white',
+    gray: 'bg-gray-50',
+    gradient: 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+  };
+  
+  const paddings = {
+    sm: 'py-8',
+    md: 'py-12',
+    lg: 'py-16',
+    xl: 'py-24'
+  };
+  
+  const classes = `${backgrounds[background]} ${paddings[padding]} ${className}`;
+  
+  if (animate) {
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className={classes}
+      >
+        {children}
+      </motion.section>
+    );
+  }
+  
+  return (
+    <section className={classes}>
+      {children}
+    </section>
+  );
+};
+
+export default Section;
+
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\services\ChatbotService.ts
+================================================================================
+// src/services/ChatbotService.ts
+
+/**
+ * This service file is a placeholder for the backend logic that would
+ * handle incoming WhatsApp messages, process them with the AI, and
+ * determine if a human handoff is needed.
+ *
+ * In a real-world application, this would run on a server.
+ * It would connect to the WhatsApp Business API and your AI model (Gemini).
+ */
+
+interface ChatMessage {
+    from: string;
+    body: string;
+    timestamp: number;
+}
+
+interface StaffAgent {
+    id: string;
+    name: string;
+    available: boolean;
+}
+
+/**
+ * Handles an incoming WhatsApp message from a customer.
+ * This is where the core logic of the chat management system would reside.
+ * @param message The incoming chat message.
+ */
+export async function handleIncomingMessage(_message: ChatMessage) {
+    console.log(`Received new message from ${_message.from}: ${_message.body}`);
+
+    // Step 1: Check if the conversation is already assigned to a staff member.
+    // This would require a database lookup.
+    const assignedAgentId = getAssignedAgent(_message.from);
+
+    if (assignedAgentId) {
+        // If already assigned, just forward the message to the assigned agent.
+        forwardMessageToAgent(_message, assignedAgentId);
+        return;
+    }
+
+    // Step 2: Process the message with the AI (Gemini).
+    // The prompt would be similar to the previous version but optimized for this system.
+    const aiResponse = await getAiResponse(_message.body);
+
+    // Step 3: Determine if a human handoff is required.
+    // This logic could be based on keywords ("live agent", "speak to someone"),
+    // the AI's confidence score, or a lack of a clear answer.
+    const needsHandoff = isHandoffRequired(aiResponse, _message.body);
+
+    if (needsHandoff) {
+        // Find an available staff member.
+        const availableAgent = findAvailableAgent();
+        if (availableAgent) {
+            assignChatToAgent(_message.from, availableAgent.id);
+            notifyAgentOfNewChat(availableAgent.id, _message);
+            sendAiResponseToCustomer("Please hold while I connect you to a staff member.", _message.from);
+        } else {
+            sendAiResponseToCustomer("All our staff are currently busy. Please leave a detailed message, and we will get back to you shortly.", _message.from);
+        }
+    } else {
+        // If no handoff is needed, send the AI's response directly to the customer.
+        sendAiResponseToCustomer(aiResponse, _message.from);
+    }
+}
+
+// --- Placeholder Functions (for demonstration purposes) ---
+
+const getAssignedAgent = (_customerNumber: string): string | null => {
+    // Real implementation would look this up in a database.
+    return null; // For now, no chats are assigned.
+};
+
+const getAiResponse = async (_query: string): Promise<string> => {
+    // Here you would make the API call to your Gemini model,
+    // using the provided knowledge base from the playbook.
+    // This is a simplified example.
+    return `AI response to "${_query}".`;
+};
+
+const isHandoffRequired = (_aiResponse: string, _originalMessage: string): boolean => {
+    // This is where you'd implement the handoff logic.
+    // e.g., return originalMessage.toLowerCase().includes("speak to a person");
+    return false;
+};
+
+const findAvailableAgent = (): StaffAgent | null => {
+    // Logic to find an available staff member.
+    return { id: "agent_123", name: "John Doe", available: true };
+};
+
+const assignChatToAgent = (_customerNumber: string, _agentId: string) => {
+    console.log(`Chat from ${_customerNumber} assigned to agent ${_agentId}.`);
+    // Database update to link customer to agent.
+};
+
+const notifyAgentOfNewChat = (_agentId: string, _message: ChatMessage) => {
+    // Logic to push a notification to the dashboard or internal system.
+    console.log(`Notifying agent ${_agentId} of new chat.`);
+};
+
+const forwardMessageToAgent = (_message: ChatMessage, _agentId: string) => {
+    // Forward the message to the live agent interface.
+    console.log(`Forwarding message from ${_message.from} to agent ${_agentId}.`);
+};
+
+const sendAiResponseToCustomer = (_response: string, _customerNumber: string) => {
+    // This would use the WhatsApp Business API to send a message back.
+    console.log(`Sending AI response to ${_customerNumber}: ${_response}`);
+};
+

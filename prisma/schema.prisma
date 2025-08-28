@@ -1,0 +1,35 @@
+// prisma/schema.prisma
+// This is your data model. It defines the tables and fields in your database.
+// For a chatbot, we need a way to store chats and messages.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // You can use other databases like 'sqlite', 'mysql', 'mongodb'
+  url      = env("DATABASE_URL")
+}
+
+// Represents a customer conversation
+model Chat {
+  id               String    @id @default(cuid()) // Unique ID for the chat
+  customerName     String
+  lastMessageText  String
+  lastMessageTime  DateTime
+  status           String    @default("bot") // "bot", "staff", or "resolved"
+  assignedTo       String?   // ID of the staff agent assigned to this chat
+  messages         Message[] // Relation to the Message model
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// Represents an individual message within a conversation
+model Message {
+  id        String   @id @default(cuid())
+  text      String
+  sender    String   // "bot" or "user"
+  timestamp DateTime @default(now())
+  chatId    String   // Foreign key to the Chat model
+  chat      Chat     @relation(fields: [chatId], references: [id])
+}
