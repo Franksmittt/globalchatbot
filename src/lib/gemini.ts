@@ -1,9 +1,8 @@
 // src/lib/gemini.ts
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// IMPORTANT: Never expose your API key in client-side code.
-// This is a server-side file and will not be accessible to the public.
-// You must set GEMINI_API_KEY as an environment variable in Vercel.
+// This is where your API key is accessed.
+// It reads the GEMINI_API_KEY from the environment variables you set in Vercel.
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
