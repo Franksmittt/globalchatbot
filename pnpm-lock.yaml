@@ -11,6 +11,9 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.8.4
         version: 0.8.4
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
       '@headlessui/react':
         specifier: ^2.2.7
         version: 2.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -140,6 +143,10 @@ packages:
 
   '@formkit/auto-animate@0.8.4':
     resolution: {integrity: sha512-DHHC01EJ1p70Q0z/ZFRBIY8NDnmfKccQoyoM84Tgb6omLMat6jivCdf272Y8k3nf4Lzdin/Y4R9q8uFtU0GbnA==}
+
+  '@google/generative-ai@0.24.1':
+    resolution: {integrity: sha512-MqO+MLfM6kjxcKoy0p1wRzG3b4ZZXtPI+z2IE26UogS2Cm/XHO+7gGRBh6gcJsOiIVoH93UwKvW4HdgiOZCy9Q==}
+    engines: {node: '>=18.0.0'}
 
   '@headlessui/react@2.2.7':
     resolution: {integrity: sha512-WKdTymY8Y49H8/gUc/lIyYK1M+/6dq0Iywh4zTZVAaiTDprRfioxSgD0wnXTQTBpjpGJuTL1NO/mqEvc//5SSg==}
@@ -2152,6 +2159,8 @@ snapshots:
   '@floating-ui/utils@0.2.10': {}
 
   '@formkit/auto-animate@0.8.4': {}
+
+  '@google/generative-ai@0.24.1': {}
 
   '@headlessui/react@2.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:

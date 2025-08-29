@@ -39,3 +39,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
   }
 }
+
+// NOTE: Your dynamic route for fetching messages at `src/app/api/messages/[chatId]/route.ts`
+// remains as-is with its GET handler. No changes are needed there.

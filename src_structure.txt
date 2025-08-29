@@ -217,6 +217,136 @@ export default function Home() {
 
 
 ================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\api\chats\route.ts
+================================================================================
+// src/app/api/chats/route.ts
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+
+// This is the GET handler to fetch all chats for the dashboard.
+// It replaces the mock 'chats' array in Dashboard.tsx.
+export async function GET() {
+  try {
+    const chats = await prisma.chat.findMany({
+      include: {
+        messages: {
+          orderBy: {
+            timestamp: 'desc',
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        lastMessageTime: 'desc',
+      },
+    });
+
+    return NextResponse.json(chats);
+  } catch (error) {
+    console.error('Failed to fetch chats:', error);
+    return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 });
+  }
+}
+
+// This is the POST handler for the WhatsApp webhook.
+// WhatsApp sends incoming messages to this endpoint.
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    console.log('Received WhatsApp webhook payload:', body);
+
+    // This is a simplified check. A real webhook needs more robust validation.
+    if (body.object === 'whatsapp_business_account' && body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
+      const messageData = body.entry[0].changes[0].value.messages[0];
+      const from = messageData.from; // Customer's WhatsApp number
+      const text = messageData.text.body;
+
+      // Check if a chat already exists for this number.
+      let chat = await prisma.chat.findFirst({
+        where: { id: from },
+      });
+
+      if (!chat) {
+        // If not, create a new chat record.
+        chat = await prisma.chat.create({
+          data: {
+            id: from,
+            customerName: from, // In a real app, you might get the name from the contact list.
+            lastMessageText: text,
+            lastMessageTime: new Date(),
+          },
+        });
+      }
+
+      // Add the new message to the database.
+      await prisma.message.create({
+        data: {
+          text: text,
+          sender: 'user',
+          chatId: chat.id,
+        },
+      });
+
+      // Implement your AI and handoff logic here (covered in the next steps)
+      // For now, let's log the message.
+      console.log(`New message from ${from}: ${text}`);
+    }
+
+    return new NextResponse('OK', { status: 200 });
+  } catch (error) {
+    console.error('Error processing WhatsApp webhook:', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
+}
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\api\messages\[chatId]\route.ts
+================================================================================
+// src/app/api/messages/route.ts
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+
+// This is the POST handler for the dashboard to send messages.
+export async function POST(request: Request) {
+  try {
+    const { text, sender, chatId } = await request.json();
+
+    if (!text || !sender || !chatId) {
+      return NextResponse.json({ error: 'Missing message data' }, { status: 400 });
+    }
+
+    // Save the new message to the database
+    const newMessage = await prisma.message.create({
+      data: {
+        text,
+        sender,
+        chatId,
+      },
+    });
+
+    // Also update the last message and timestamp on the chat record
+    await prisma.chat.update({
+      where: { id: chatId },
+      data: {
+        lastMessageText: text,
+        lastMessageTime: new Date(),
+        status: 'staff', // When a staff member replies, the status changes to staff
+      },
+    });
+
+    // In a real application, you would also use the WhatsApp Business API here
+    // to send this message back to the customer.
+
+    return NextResponse.json(newMessage);
+  } catch (error) {
+    console.error('Failed to send message:', error);
+    return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
+  }
+}
+
+
+================================================================================
 FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\app\dashboard\page.tsx
 ================================================================================
 import Header from '@/components/Header';
@@ -239,32 +369,120 @@ export default function DashboardPage() {
 ================================================================================
 FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\components\Dashboard.tsx
 ================================================================================
+// src/components/Dashboard.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Send, Bot, User, Phone, CheckCircle, XCircle, Search } from 'lucide-react';
+import { Send, Phone, CheckCircle, XCircle, Search } from 'lucide-react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 
-const chats = [
-  { id: 1, name: 'John Smith', lastMessage: 'My battery is completely flat.', time: '1:32 PM', status: 'bot', assignedTo: null },
-  { id: 2, name: 'Jane Williams', lastMessage: 'Do you have the 646 battery in stock?', time: '1:25 PM', status: 'staff', assignedTo: 'John Doe' },
-  { id: 3, name: 'Sipho Zulu', lastMessage: 'I need a jump-start in Alberton.', time: '1:10 PM', status: 'bot', assignedTo: null },
-  { id: 4, name: 'Peter Jones', lastMessage: 'How long is the Willard warranty?', time: '12:55 PM', status: 'bot', assignedTo: null },
-  { id: 5, name: 'Nonhlanhla Dlamini', lastMessage: 'Thank you, the fitment was quick!', time: 'Yesterday', status: 'resolved', assignedTo: 'Jane Smith' },
-];
+// Define the types for your data to ensure type safety.
+// These types should match the models you defined in prisma/schema.prisma.
+interface Chat {
+  id: string;
+  customerName: string;
+  lastMessageText: string;
+  lastMessageTime: string; // Use string for the time from the database
+  status: 'bot' | 'staff' | 'resolved';
+  assignedTo: string | null;
+}
 
-const messages = [
-  { id: 1, sender: 'bot', text: 'Hi there! I\'m the Global Batteries Smart Assistant. How can I help you today?' },
-  { id: 2, sender: 'user', text: 'My battery is completely flat. My car is a 2018 Toyota Corolla.' },
-  { id: 3, sender: 'bot', text: 'Sorry to hear that. A flat battery can be a sign of a larger issue. I recommend our free battery and alternator test. Or, if you\'re in the Alberton area, we can send a driver to assist you with a jump-start. Would you like me to hand you over to a staff member to assist further?' },
-  { id: 4, sender: 'user', text: 'Yes please. I am in the Alberton area.' },
-  { id: 5, sender: 'bot', text: 'I am connecting you with a live agent. Please hold...' },
-];
+interface Message {
+  id: string;
+  text: string;
+  sender: 'bot' | 'user' | 'staff';
+  timestamp: string;
+  chatId: string;
+}
 
 const Dashboard = () => {
-  const [selectedChat, setSelectedChat] = useState(chats[0]);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messageInput, setMessageInput] = useState('');
   const [parent] = useAutoAnimate();
+
+  // useEffect hook to fetch all chats when the component loads.
+  useEffect(() => {
+    async function fetchChats() {
+      try {
+        const response = await fetch('/api/chats');
+        if (!response.ok) {
+          throw new Error('Failed to fetch chats');
+        }
+        const data = await response.json();
+        setChats(data);
+        // Automatically select the first chat if chats are available
+        if (data.length > 0) {
+          setSelectedChat(data[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching chats:', error);
+      }
+    }
+
+    fetchChats();
+  }, []);
+
+  // useEffect hook to fetch messages for the selected chat.
+  useEffect(() => {
+    async function fetchMessages() {
+      if (selectedChat) {
+        try {
+          // Fetch messages from the dynamic API route
+          const response = await fetch(`/api/messages/${selectedChat.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch messages');
+          }
+          const data = await response.json();
+          setMessages(data);
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+          setMessages([]);
+        }
+      } else {
+        setMessages([]);
+      }
+    }
+
+    fetchMessages();
+  }, [selectedChat]); // This effect re-runs whenever selectedChat changes
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageInput.trim() || !selectedChat) return;
+
+    // Here, you would send the message to your API
+    const newMessage: Omit<Message, 'id' | 'timestamp'> = {
+      text: messageInput,
+      sender: 'staff',
+      chatId: selectedChat.id,
+    };
+
+    // The POST request to your API to save and send the message
+    try {
+      const response = await fetch(`/api/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMessage),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      // After successful send, update the UI with the new message
+      const sentMessage = await response.json();
+      setMessages((prevMessages) => [...prevMessages, sentMessage]);
+      setMessageInput('');
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] space-y-4 lg:space-y-0 lg:space-x-4">
@@ -288,34 +506,38 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto" ref={parent}>
-          {chats.map((chat) => (
-            <div
-              key={chat.id}
-              onClick={() => setSelectedChat(chat)}
-              className={`flex items-center p-4 border-b border-gray-100 cursor-pointer transition-colors ${selectedChat.id === chat.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}`}
-            >
-              <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xl mr-4">
-                {chat.name.charAt(0)}
-                <span
-                  className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
-                    chat.status === 'staff' ? 'bg-green-500' :
-                    chat.status === 'bot' ? 'bg-yellow-400' :
-                    'bg-gray-400'
-                  }`}
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-gray-900">{chat.name}</h3>
-                  <span className="text-xs text-gray-500">{chat.time}</span>
+          {chats.length > 0 ? (
+            chats.map((chat) => (
+              <div
+                key={chat.id}
+                onClick={() => setSelectedChat(chat)}
+                className={`flex items-center p-4 border-b border-gray-100 cursor-pointer transition-colors ${selectedChat?.id === chat.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}`}
+              >
+                <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xl mr-4">
+                  {chat.customerName.charAt(0)}
+                  <span
+                    className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
+                      chat.status === 'staff' ? 'bg-green-500' :
+                      chat.status === 'bot' ? 'bg-yellow-400' :
+                      'bg-gray-400'
+                    }`}
+                  />
                 </div>
-                <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-                {chat.assignedTo && (
-                  <span className="text-xs text-blue-600 font-medium">Assigned to: {chat.assignedTo}</span>
-                )}
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold text-gray-900">{chat.customerName}</h3>
+                    <span className="text-xs text-gray-500">{new Date(chat.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 truncate">{chat.lastMessageText}</p>
+                  {chat.assignedTo && (
+                    <span className="text-xs text-blue-600 font-medium">Assigned to: {chat.assignedTo}</span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="p-4 text-center text-gray-500">No chats available.</div>
+          )}
         </div>
       </motion.div>
 
@@ -332,7 +554,7 @@ const Dashboard = () => {
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xl mr-4">
-                  {selectedChat.name.charAt(0)}
+                  {selectedChat.customerName.charAt(0)}
                   <span
                     className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
                       selectedChat.status === 'staff' ? 'bg-green-500' :
@@ -342,7 +564,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{selectedChat.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedChat.customerName}</h3>
                   <p className="text-sm text-gray-500">
                     {selectedChat.status === 'bot' ? 'Assisted by Chatbot' : 'Assigned to a staff member'}
                   </p>
@@ -377,10 +599,12 @@ const Dashboard = () => {
 
             {/* Message Input */}
             <div className="p-4 border-t border-gray-200 bg-white">
-              <form className="flex space-x-2">
+              <form onSubmit={handleSendMessage} className="flex space-x-2">
                 <input
                   type="text"
                   placeholder="Type a message..."
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
                   className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                 />
                 <button
@@ -789,6 +1013,33 @@ export default Section;
 
 
 ================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\lib\prisma.ts
+================================================================================
+// src/lib/prisma.ts
+import { PrismaClient } from '@prisma/client';
+
+let prisma: PrismaClient;
+
+// We use a singleton pattern to ensure only one PrismaClient instance is used
+// in the application, which is important for preventing multiple connections
+// especially during development hot-reloading.
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!global.prisma) {
+    global.prisma = new PrismaClient();
+  }
+  prisma = global.prisma;
+}
+
+export default prisma;
+
+
+================================================================================
 FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\src\services\ChatbotService.ts
 ================================================================================
 // src/services/ChatbotService.ts
@@ -901,4 +1152,44 @@ const sendAiResponseToCustomer = (_response: string, _customerNumber: string) =>
     // This would use the WhatsApp Business API to send a message back.
     console.log(`Sending AI response to ${_customerNumber}: ${_response}`);
 };
+
+
+================================================================================
+FILE PATH: C:\Users\shop\Downloads\nextjs-tailwind-starter-templateCHATBOT\GlobalChatbot\prisma\schema.prisma
+================================================================================
+// prisma/schema.prisma
+// This is your data model. It defines the tables and fields in your database.
+// For a chatbot, we need a way to store chats and messages.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // You can use other databases like 'sqlite', 'mysql', 'mongodb'
+  url      = env("DATABASE_URL")
+}
+
+// Represents a customer conversation
+model Chat {
+  id               String    @id @default(cuid()) // Unique ID for the chat
+  customerName     String
+  lastMessageText  String
+  lastMessageTime  DateTime
+  status           String    @default("bot") // "bot", "staff", or "resolved"
+  assignedTo       String?   // ID of the staff agent assigned to this chat
+  messages         Message[] // Relation to the Message model
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// Represents an individual message within a conversation
+model Message {
+  id        String   @id @default(cuid())
+  text      String
+  sender    String   // "bot" or "user"
+  timestamp DateTime @default(now())
+  chatId    String   // Foreign key to the Chat model
+  chat      Chat     @relation(fields: [chatId], references: [id])
+}
 
